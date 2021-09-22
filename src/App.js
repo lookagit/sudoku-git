@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from './components/Grid';
-import { solver, isSolvable, isComplete } from './utils/sudoku';
-import { solve, clear, undo} from './actions/grid';
+import { isSolvable, isComplete } from './utils/sudoku';
+import { setError, setSolved } from './actions/grid';
 
 /* Application Container Component */
 const App = React.createClass({
@@ -14,53 +14,33 @@ const App = React.createClass({
 		this.unsubscribe();
 	},
 	render() {
-		const {store} = this.props;
-		const {grid, status} = store.getState();
-		const {isSolved, isEdited} = status;
+		const { store } = this.props;
+		const { grid: { initArray, solved, errorLabel }, status } = store.getState();
+		const { isSolved } = status;
 		return (
 			<div>
-				<button
-					className='undo'
-					disabled={window.gridHistory && !window.gridHistory.length}
-					onClick={() => store.dispatch(undo())}
-				>
-					⤺ Undo
-				</button>
-				<button
-					className='clear'
-					disabled={!isEdited}
-					onClick={() => store.dispatch(clear())}
-				>
-					⟲ Clear
-				</button>
-
-				<Grid grid={grid} status={status} {...this.props}/>
-
+				<Grid grid={initArray} status={status} {...this.props} />
+				<div style={{ height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+					{errorLabel ? <p style={{ color: 'red' }}>{errorLabel}</p> : null}
+					{solved ? <p>SOLVED</p> : null}
+				</div>
 				<button
 					className='check'
 					disabled={isSolved}
 					onClick={() => {
-						if (isSolvable(grid)) {
-							if (isComplete(grid)) {
-								return alert('Congratulations, you solved it!!');
+						if (isSolvable(initArray)) {
+							if (isComplete(initArray)) {
+								store.dispatch(setSolved(true));
+								return;
 							}
-							alert('This Sudoku is solvable, keep going !!');
+							store.dispatch(setError(null))
 						} else {
-							alert('This Sudoku is NOT solvable');
+							store.dispatch(setError("This Sudoku is NOT solvable"));
 						}					
 					}}
 				>
 					Check
-				</button>
-				<button
-					className='solve'
-					onClick={() => store.dispatch(solve())}
-				>
-					Solve
-				</button>			
-				<div className='footnote'>
-					<p>by <a href='http://danialk.github.io/'> Danial Khosravi </a> </p>
-				</div>				
+				</button>		
 			</div>
 
 		);

@@ -1,28 +1,27 @@
 /* Action Creators */
 
-export function inputValue(row, col, val) {
-	return {
+const inputValue = (row, col, val) => ({
 		type: 'INPUT_VALUE',
 		row,
 		col,
 		val
-	};
-}
+	}
+)
 
-export function solve() {
-	return {
-		type: 'SOLVE'
-	};
-}
+const setError = (errorLabel) => ({
+	type: 'SET_ERROR',
+	errorLabel,
+	solved: false
+})
 
-export function clear() {
-	return {
-		type: 'CLEAR'
-	};
-}
+const setSolved = (solved) => ({
+	type: 'SET_SOLVED',
+	solved,
+	errorLabel: null,
+})
 
-export function undo() {
-	return {
-		type: 'UNDO'
-	};
+export {
+	setSolved,
+	inputValue,
+	setError
 }

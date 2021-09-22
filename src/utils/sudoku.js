@@ -1,7 +1,8 @@
 import cloneDeep from 'lodash/cloneDeep';
 import flatten from 'lodash/flatten';
 import range from 'lodash/range';
-import includes from 'lodash/includes';
+import contains from 'lodash/includes';
+import * as _ from 'lodash';
 
 const VALUES = range(1, 10);
 const DIM = range(0, 9);
@@ -78,6 +79,83 @@ const getNext = (rowNum = 0, colNum = 0) => {
 	the end of the grid and returns true
 	or else if the grid is not solvable, it will return false
 */
+
+const checkDuplicates = numbers => {
+	const withoutZeros = numbers.filter(item => item !== 0 && item);
+	return _.uniq(withoutZeros).length !== withoutZeros.length;
+}
+
+const checkRow = (grid) => {
+	let duplicate = false;
+	for(let i = 0; i <= 8; i++) {
+		const row = grid[i];
+		if(checkDuplicates(row)) {
+			duplicate = true;
+			break;
+		}
+	}
+	return duplicate;
+}
+
+const checkColumn = (grid) => {
+	let duplicate = false;
+	for(let i = 0; i <= 8; i++) {
+		const column = grid[i].filter(item => item[0]);
+		if(checkDuplicates(column))
+			duplicate = true;
+			break;
+	}
+	return duplicate;
+}
+
+const letsCreateNewArr = (gridState) => {
+	const initialForReduce =  {
+    numberOfCubes: 3,
+    numberInitialCubesGetter: 3,
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
+    8: []
+	}
+	const createArrayForBoxes = gridState && gridState.length && gridState.reduce((accumulator, currentValue, index) => {
+			const [first, second, third, four, five, six, seven, eight, nine] = currentValue;
+			const { numberOfCubes, numberInitialCubesGetter } = accumulator;
+			const indexPlusOne = index + 1;
+			accumulator = {
+					...accumulator,
+					numberOfCubes: indexPlusOne === numberOfCubes ? numberOfCubes + numberInitialCubesGetter : numberOfCubes,
+					[numberOfCubes - 3]: [ ...accumulator[numberOfCubes - 3], first, second, third],
+					[numberOfCubes - 2]: [ ...accumulator[numberOfCubes - 2], four, five, six],
+					[numberOfCubes - 1]: [...accumulator[numberOfCubes - 1], seven, eight, nine]
+			}
+			return accumulator;
+	}, initialForReduce)
+	
+	return Object.keys(createArrayForBoxes)
+			.filter((item) => item && !item.startsWith('number'))
+			.map(wantedArrayItem => createArrayForBoxes[wantedArrayItem]);
+	
+}
+
+const checkBox = (grid) => {
+		const createdFromGrid = letsCreateNewArr(grid);
+		const [areThereDuplicates] = createdFromGrid.filter((gridItems) => checkDuplicates(gridItems));
+		return areThereDuplicates;
+}
+
+export const solver2 = (grid) => {
+	if(checkRow(grid)) return true;
+	if(checkColumn(grid)) return true;
+	if(checkBox(grid)) return true;		
+	
+	return false;	
+}
+
 export const solver = (grid, rowNum = 0, colNum = 0) => {
 	if (contains(DIM, rowNum) < 0 || contains(DIM, colNum) < 0) {
 		throw new Error('rowNum or colNum are not in range');
@@ -121,7 +199,7 @@ export const solver = (grid, rowNum = 0, colNum = 0) => {
 
 export const isSolvable = (grid) => {
 	let clonedGrid = cloneDeep(grid);
-	return solver(clonedGrid);
+	return !solver2(clonedGrid);
 }
 
 /*

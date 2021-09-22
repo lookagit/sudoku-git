@@ -4,8 +4,8 @@ import Box from './Box';
 /* Grid Component */
 const Grid = React.createClass({
 	render() {
-		const {grid, status} = this.props;
-		const {isSolved} = status;
+		const { grid, status } = this.props;
+		const { isSolved } = status;
 		const renderBox = (row, val, col) => {
 			return (
 				<Box
