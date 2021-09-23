@@ -126,14 +126,13 @@ const letsCreateNewArr = (gridState) => {
 			const [first, second, third, four, five, six, seven, eight, nine] = currentValue;
 			const { numberOfCubes, numberInitialCubesGetter } = accumulator;
 			const indexPlusOne = index + 1;
-			accumulator = {
+			return ({
 					...accumulator,
 					numberOfCubes: indexPlusOne === numberOfCubes ? numberOfCubes + numberInitialCubesGetter : numberOfCubes,
 					[numberOfCubes - 3]: [ ...accumulator[numberOfCubes - 3], first, second, third],
 					[numberOfCubes - 2]: [ ...accumulator[numberOfCubes - 2], four, five, six],
 					[numberOfCubes - 1]: [...accumulator[numberOfCubes - 1], seven, eight, nine]
-			}
-			return accumulator;
+			})
 	}, initialForReduce)
 	
 	return Object.keys(createArrayForBoxes)
